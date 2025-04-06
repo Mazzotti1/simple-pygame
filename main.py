@@ -72,7 +72,7 @@ class App:
         if self.player is None:
            self.player = Player(400, 400, 128, 128)
         
-        self.player.update(self.ground_rect, dt)
+        self.player.update(self.ground_rect, dt, self.screen.get_width())
         self.player.draw(self.screen)
           
     def run(self):
