@@ -2,7 +2,7 @@ import pygame
 import sys
 from button import Button
 from player import Player
-
+from puff_effect import PuffEffect
 
 class App:
     def __init__(self):
@@ -19,6 +19,7 @@ class App:
         self.player = None
         self.enemy = None
         self.ground_rect = None
+        self.puffs = []
 
         exit_rect = pygame.Rect(680, 335, 130, 50)
         self.exit_btn = Button(
@@ -89,10 +90,28 @@ class App:
                     
             if self.current_scene == "game":
                 keys = pygame.key.get_pressed()
+                self.draw_scene(dt)
                 if self.player:
                   self.player.handle_input(keys, dt)
-                self.draw_scene(dt)
 
+                  for book in self.player.projectiles[:]:
+                        book.update(dt)
+                        book.draw(self.screen)
+                        
+                        if not book.active:
+                            puff = PuffEffect(book.rect.centerx - 16, book.rect.centery - 16)
+                            self.puffs.append(puff)
+                            self.player.projectiles.remove(book)
+                        elif book.rect.x < 0 or book.rect.x > self.screen.get_width():
+                            self.player.projectiles.remove(book)
+
+                for puff in self.puffs[:]:
+                    puff.update(dt)
+                    puff.draw(self.screen)
+                    if puff.finished:
+                        self.puffs.remove(puff)
+
+            pygame.time.Clock().tick(60)
             pygame.display.flip()
 
         pygame.quit()
