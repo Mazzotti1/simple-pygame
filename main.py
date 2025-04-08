@@ -3,6 +3,7 @@ import sys
 from button import Button
 from player import Player
 from puff_effect import PuffEffect
+from enemy import Enemy
 
 class App:
     def __init__(self):
@@ -48,10 +49,12 @@ class App:
     def start_game(self):
         self.current_scene = "game"
         
-    def draw_scene(self, dt):
+    def draw_scene(self, dt, solids):
         self.create_background()
         self.ground_rect = self.create_ground()
-        self.create_player(dt)
+        self.create_player(dt, solids)
+        self.create_enemy(dt, solids)
+        self.draw_solids(solids)
         # self.create_ui()
       
     def create_background(self):
@@ -68,14 +71,30 @@ class App:
         
         return ground_rect
 
-    def create_player(self, dt):
+    def create_player(self, dt, solids):
         if self.player is None:
            self.player = Player(400, 400, 128, 128)
         
-        self.player.update(self.ground_rect, dt, self.screen.get_width())
+        self.player.update(self.ground_rect, dt, solids, self.screen.get_width())
         self.player.draw(self.screen)
           
+    def create_enemy(self, dt, solids):
+        if self.enemy is None:
+            self.enemy = Enemy(650, 500)
+
+        self.enemy.update(self.ground_rect, solids, dt)
+        self.enemy.draw(self.screen)
+
+    def draw_solids(self, solids):
+        for solid in solids:
+            pygame.draw.rect(self.screen, (100, 100, 100), solid)
+
     def run(self):
+        solids = [
+            pygame.Rect(300, 520, 100, 50),
+            pygame.Rect(200, 540, 100, 30), 
+        ]
+
         while self.running:
             dt = self.clock.tick(60) / 1000
             for event in pygame.event.get():
@@ -90,7 +109,7 @@ class App:
                     
             if self.current_scene == "game":
                 keys = pygame.key.get_pressed()
-                self.draw_scene(dt)
+                self.draw_scene(dt, solids)
                 if self.player:
                   self.player.handle_input(keys, dt)
 
@@ -120,3 +139,8 @@ class App:
 if __name__ == "__main__":
     app = App()
     app.run()
+
+
+#Referencias:
+# https://www.pygame.org/docs/
+# https://github.com/Rabbid76/PyGameExamplesAndAnswers/blob/master/documentation/pygame/pygame_collision_and_intesection.md

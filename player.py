@@ -21,9 +21,9 @@ class Player(Entity):
         self.current_frame = self.current_frames[0]
         self.projectiles = []
 
-    def update(self, ground_rect, dt, screen_width):
+    def update(self, ground_rect, dt, solids, screen_width):
         self.apply_gravity(dt)
-        self.check_collision(ground_rect)
+        self.check_collision(ground_rect, solids)
         self.update_animation(dt)
 
         if self.rect.left < 0:
