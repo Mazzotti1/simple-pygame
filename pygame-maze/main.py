@@ -10,6 +10,11 @@ class App:
         self.running = True
         self.current_scene = "MENU"
         
+        R = 20
+        C = 20
+        L = 10
+
+
         self.screen = pygame.display.set_mode((1280, 720))
         pygame.display.set_caption("Tela inicial")
         self.clock = pygame.time.Clock()
@@ -60,6 +65,10 @@ class App:
 
                 if(self.current_scene == "MAZE"):
                     self.screen.fill((66, 245, 215)) 
+
+            [row, col] = ((self.screen.get_width() - (self.R * self.L)) //2,
+                          (self.screen.get_height() - (self.C * self.L)) //2)
+                        
 
             pygame.time.Clock().tick(60)
             pygame.display.flip()
