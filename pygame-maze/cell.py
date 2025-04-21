@@ -11,24 +11,35 @@ class Cell:
         self.open = open
 
 
-        def draw(self, screen, col, row, edge):
-            start_upper_area = (col, row)
-            end_upper_area = (col + edge, row)
+    def draw(self, screen, col, row, edge):
+        start_upper_area = (col, row)
+        end_upper_area = (col + edge, row)
 
-            start_lower_area = (col, row + edge)
-            end_lower_area = (col + edge, row + edge)
+        start_lower_area = (col, row + edge)
+        end_lower_area = (col + edge, row + edge)
 
-            start_left_area = (col, row)
-            end_left_area = (col, row + edge)
+        start_left_area = (col, row)
+        end_left_area = (col, row + edge)
 
-            start_right_area = (col + edge, row)
-            end_right_area = (col + edge, row + edge)
+        start_right_area = (col + edge, row)
+        end_right_area = (col + edge, row + edge)
 
-            if (self.open):
-                    pygame.draw.rect(screen, self.openColor, (col, row, edge, edge))
-            else:
-                    pygame.draw.rect(screen, self.backgroundColor, (col, row, edge, edge))
+        if (self.open):
+                pygame.draw.rect(screen, self.openColor, (col, row, edge, edge))
+        else:
+                pygame.draw.rect(screen, self.backgroundColor, (col, row, edge, edge))
 
-            for drawLine in range(4):
-                    pygame.draw.line(screen, self.edgeColor)
-            #iterar as lines da celula
+        # pygame.draw.line(screen, self.edgeColor, start_upper_area, end_upper_area)
+        # pygame.draw.line(screen, self.edgeColor, start_lower_area, end_lower_area)
+        # pygame.draw.line(screen, self.edgeColor, start_left_area, end_left_area)
+        # pygame.draw.line(screen, self.edgeColor, start_right_area, end_right_area)
+
+        # para quebrar as linhas do labirinto
+        if self.edges.top:
+            pygame.draw.line(screen, self.edgeColor, start_upper_area, end_upper_area)
+        if self.edges.bottom:
+            pygame.draw.line(screen, self.edgeColor, start_lower_area, end_lower_area)
+        if self.edges.left:
+            pygame.draw.line(screen, self.edgeColor, start_left_area, end_left_area)
+        if self.edges.right:
+            pygame.draw.line(screen, self.edgeColor, start_right_area, end_right_area)
