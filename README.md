@@ -1,3 +1,3 @@
 Alunos:
-Gabriel Mazzotti
+Gabriel Mazzotti |
 Isabela Mindof
