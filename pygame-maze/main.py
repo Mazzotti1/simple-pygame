@@ -87,7 +87,7 @@ class App:
             position=(50, 200),
             size=(180, 50),
             text="Força bruta (B)",
-            on_click=self.solve_maze("brute_force"),
+            on_click=self.solve_brute_force,
             text_color="black"
         )
 
@@ -96,7 +96,7 @@ class App:
             position=(50, 300),
             size=(180, 50),
             text="DFS (D)",
-            on_click=self.solve_maze("dfs"),
+            on_click=self.solve_dfs,
             text_color="white"
         )
 
@@ -239,7 +239,8 @@ class App:
             for col in range(self.maze.col_size):
                 self.maze.grid[row][col].current = False
 
-    def solve_maze(self, type):
+    def solve_brute_force(self):
+        print("iniciando com brute force")
         if not self.generation_complete:
             return
 
@@ -254,18 +255,42 @@ class App:
         self.maze.grid[self.row_size-1][self.col_size-2].edges.right = False
         self.maze.grid[self.row_size-1][self.col_size-1].edges.left = False
 
-        if type == "brute_force":
-            solver = BruteForceSolver(
-                grid=self.maze.grid.grid,
-                start=(1, 0),
-                end=(self.row_size-1, self.col_size-1)
-            )
+        solver = BruteForceSolver(
+            grid=self.maze.grid.grid,
+            start=(1, 0),
+            end=(self.row_size-1, self.col_size-1)
+        )
+
+        solutions = solver.solve()
+
+        if solutions:
+            self.solution_path = solutions[0]
+            print(f"solucao , distancia: {len(self.solution_path)}")
         else:
-            solver = DfsSolver(
-                grid=self.maze.grid.grid,
-                start=(1, 0),
-                end=(self.row_size-1, self.col_size-1)
-            )
+            print("n achou solucao")
+            self.solving = False
+
+    def solve_dfs(self):
+        print("iniciando com dfs")
+        if not self.generation_complete:
+            return
+
+        self.solving = True
+        self.show_full_path = False
+        self.solution_path = None
+        self.current_solution_step = 0
+
+        self.maze.grid[1][0].edges.right = False
+        self.maze.grid[1][1].edges.left = False
+
+        self.maze.grid[self.row_size-1][self.col_size-2].edges.right = False
+        self.maze.grid[self.row_size-1][self.col_size-1].edges.left = False
+
+        solver = DfsSolver(
+            grid=self.maze.grid.grid,
+            start=(1, 0),
+            end=(self.row_size-1, self.col_size-1)
+        )
 
         solutions = solver.solve()
 
@@ -346,9 +371,9 @@ class App:
                         elif event.key == pygame.K_ESCAPE:
                             self.back_to_menu()
                         elif event.key == pygame.K_b:
-                            self.solve_maze("brute_force")
+                            self.solve_brute_force()
                         elif event.key == pygame.K_d:
-                            self.solve_maze("dfs")
+                            self.solve_dfs()
 
             self.screen.fill((0, 0, 0))
 
@@ -376,6 +401,10 @@ class App:
                 status_text = "Pronto!" if self.generation_complete else "Escolha uma opçao..."
                 status = self.font.render(status_text, True, (0, 0, 0))
                 self.screen.blit(status, (50, 50))
+
+                bt_warning_text = "Se for maior q 7x7 vai crashar"
+                bt_warning_status = self.font.render(bt_warning_text, True, (0, 0, 0))
+                self.screen.blit(bt_warning_status, (50, 170))
 
                 self.maze.grid.drawMaze(self.screen, col, row)
 

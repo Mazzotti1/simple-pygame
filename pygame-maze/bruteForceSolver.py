@@ -5,66 +5,54 @@ class BruteForceSolver:
         self.start = start
         self.end = end
         self.rows = len(grid)
-        self.cols = len(grid[0]) if self.rows > 0 else 0
-        self.all_paths = []
+        self.cols = len(grid[0])
+        self.best_solution = None
 
     def solve(self):
-        self._generate_all_possible_paths()
-
-        valid_paths = []
-        for path in self.all_paths:
-            if self._is_valid_path(path):
-                valid_paths.append(path)
-
-        return valid_paths
-
-    def _generate_all_possible_paths(self):
         from itertools import product
-
         max_length = self.rows * self.cols
 
-        directions = [(0,1), (1,0), (0,-1), (-1,0)]
-
         for length in range(1, max_length + 1):
-            for path in product(directions, repeat=length):
-                full_path = [self.start]
+            for path in product([(0,1),(1,0),(0,-1),(-1,0)], repeat=length):
                 current = self.start
+                visited = [current]
                 valid = True
 
                 for step in path:
-                    new_row = current[0] + step[0]
-                    new_col = current[1] + step[1]
+                    new_pos = (current[0] + step[0], current[1] + step[1])
 
-                    if not (0 <= new_row < self.rows and 0 <= new_col < self.cols):
+                    if not (0 <= new_pos[0] < self.rows and 0 <= new_pos[1] < self.cols):
                         valid = False
                         break
 
-                    full_path.append((new_row, new_col))
-                    current = (new_row, new_col)
+                    if not self._is_valid_move(current, new_pos):
+                        valid = False
+                        break
 
-                if valid:
-                    self.all_paths.append(full_path)
+                    if new_pos in visited:
+                        valid = False
+                        break
 
-    def _is_valid_path(self, path):
-        if path[-1] != self.end:
-            return False
+                    visited.append(new_pos)
+                    current = new_pos
 
-        for i in range(len(path)-1):
-            row, col = path[i]
-            next_row, next_col = path[i+1]
+                    if current == self.end:
+                        if self.best_solution is None or len(visited) < len(self.best_solution):
+                            self.best_solution = visited.copy()
+                        break
 
-            dr = next_row - row
-            dc = next_col - col
+                if valid and current == self.end:
+                    return [self.best_solution]
 
-            cell = self.grid[row][col]
+        return [self.best_solution] if self.best_solution else []
 
-            if dr == 1 and cell.edges.bottom:
-                return False
-            elif dr == -1 and cell.edges.top:
-                return False
-            elif dc == 1 and cell.edges.right:
-                return False
-            elif dc == -1 and cell.edges.left:
-                return False
+    def _is_valid_move(self, current, new_pos):
+        dr = new_pos[0] - current[0]
+        dc = new_pos[1] - current[1]
+        cell = self.grid[current[0]][current[1]]
 
-        return True
+        if dr == 1: return not cell.edges.bottom
+        if dr == -1: return not cell.edges.top
+        if dc == 1: return not cell.edges.right
+        if dc == -1: return not cell.edges.left
+        return False
